@@ -1,0 +1,448 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{amsmath,amsfonts,amssymb,amsthm,commath,dsfont}
+\usepackage{enumitem}
+\usepackage{framed}
+\usepackage{xspace}
+\usepackage{microtype}
+\usepackage{float}
+\usepackage[round]{natbib}
+\bibliographystyle{plainnat}
+\usepackage{cleveref}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage[breakable]{tcolorbox}
+\tcbset{breakable}
+\usepackage{mathtools}
+\usepackage{caption}
+\usepackage{subcaption}
+\def\b1{\boldsymbol{1}}
+
+\newcommand{\colbar}{\rule[-3mm]{.3mm}{1.5em}}
+\newcommand{\rowbar}{\rule[.5ex]{1.5em}{.3mm}}
+\DeclareMathOperator{\rank}{rank}
+\def\balpha{\boldsymbol{\alpha}}
+% following loops stolen from djhsu
+\def\ddefloop#1{\ifx\ddefloop#1\else\ddef{#1}\expandafter\ddefloop\fi}
+% \bbA, \bbB, ...
+\def\ddef#1{\expandafter\def\csname bb#1\endcsname{\ensuremath{\mathbb{#1}}}}
+\ddefloop ABCDEFGHIJKLMNOPQRSTUVWXYZ\ddefloop
+
+% \cA, \cB, ...
+\def\ddef#1{\expandafter\def\csname c#1\endcsname{\ensuremath{\mathcal{#1}}}}
+\ddefloop ABCDEFGHIJKLMNOPQRSTUVWXYZ\ddefloop
+
+% \vA, \vB, ..., \va, \vb, ...
+\def\ddef#1{\expandafter\def\csname v#1\endcsname{\ensuremath{\boldsymbol{#1}}}}
+\ddefloop ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz\ddefloop
+
+% \valpha, \vbeta, ...,  \vGamma, \vDelta, ...,
+\def\ddef#1{\expandafter\def\csname v#1\endcsname{\ensuremath{\boldsymbol{\csname #1\endcsname}}}}
+\ddefloop {alpha}{beta}{gamma}{delta}{epsilon}{varepsilon}{zeta}{eta}{theta}{vartheta}{iota}{kappa}{lambda}{mu}{nu}{xi}{pi}{varpi}{rho}{varrho}{sigma}{varsigma}{tau}{upsilon}{phi}{varphi}{chi}{psi}{omega}{Gamma}{Delta}{Theta}{Lambda}{Xi}{Pi}{Sigma}{varSigma}{Upsilon}{Phi}{Psi}{Omega}{ell}\ddefloop
+
+\newcommand\T{{\scriptscriptstyle\mathsf{T}}}
+\def\diag{\textup{diag}}
+
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\def\SPAN{\textup{span}}
+\def\tu{\textup{u}}
+\def\R{\mathbb{R}}
+\def\E{\mathbb{E}}
+\def\Z{\mathbb{Z}}
+\def\be{\mathbf{e}}
+\def\nf{\nabla f}
+\def\veps{\varepsilon}
+\def\cl{\textup{cl}}
+\def\inte{\textup{int}}
+\def\dom{\textup{dom}}
+\def\Rad{\textup{Rad}}
+\def\lsq{\ell_{\textup{sq}}}
+\def\hcR{\widehat{\cR}}
+\def\hcRl{\hcR_\ell}
+\def\cRl{\cR_\ell}
+\def\hcE{\widehat{\cE}}
+\def\cEl{\cE_\ell}
+\def\hcEl{\hcE_\ell}
+\def\eps{\epsilon}
+\def\1{\mathds{1}}
+\newcommand{\red}[1]{{\color{red} #1}}
+\newcommand{\blue}[1]{{\color{blue} #1}}
+\def\srelu{\sigma_{\textup{r}}}
+\def\vsrelu{\vec{\sigma_{\textup{r}}}}
+\def\vol{\textup{vol}}
+\def\sr{\sigma_r}
+\def\hw{\textbf{[\texttt{hw2}]}\xspace}
+\def\hwcode{\textbf{[\texttt{hw2code}]}\xspace}
+
+
+\newcommand{\ip}[2]{\left\langle #1, #2 \right \rangle}
+\newcommand{\mjt}[1]{{\color{blue}\emph{\textbf{[MJT:}~#1~\textbf{]}}}}
+
+\newcommand{\tildephi}{\psi}
+
+
+\newtheorem{fact}{Fact}
+\newtheorem{lemma}{Lemma}
+\newtheorem{claim}{Claim}
+\newtheorem{proposition}{Proposition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\newtheorem{condition}{Condition}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+\newtheorem{example}{Example}
+
+
+
+\newenvironment{Q}
+{%
+\clearpage
+\item
+}
+{%
+\phantom{s}%lol doesn't work
+\bigskip%
+\noindent\textbf{Solution.}
+}
+
+\title{CSCI-GA.2565 --- Homework 2}
+\author{\emph{your NetID here}}
+\date{Version 1.0}
+
+\begin{document}
+\maketitle
+
+\noindent\textbf{Instructions.}
+  \begin{itemize}
+    \item
+      \textbf{Due date.}
+      Homework is due \textbf{Wednesday, February 26, at noon EST}.
+
+    \item
+      \textbf{Gradescope submission.}
+      Everyone must submit individually at gradescope under \texttt{hw2} and \texttt{hw2code}:
+      \texttt{hw2code} is just python code, whereas \texttt{hw2} contains everything else.
+      For clarity, problem parts are annotated with where the corresponding submissions go.
+
+
+      \begin{itemize}
+        \item
+          \textbf{Submitting \texttt{hw2}.}
+          \texttt{hw2} must be submitted as a single PDF file, and typeset in some way,
+          for instance using \LaTeX, Markdown, Google Docs, MS Word; you can even use an OCR
+          package (or a modern multi-modal LLM) to convert handwriting to \LaTeX and then clean
+          it up for submission.  Graders reserve the right to award zero points for
+          solutions they consider illegible.
+
+        \item
+          \textbf{Submitting \texttt{hw2code}.}
+          Only upload the two python files \texttt{hw2.py} and \texttt{hw2\_utils.py};
+          don't upload a zip file or additional files.
+
+      \end{itemize}
+
+    \item
+      \textbf{Consulting LLMs and friends.}
+      You may discuss with your peers and you may use LLMs.  \emph{However,} you are strongly
+      advised to make a serious attempt on all problems alone, and if you consult anyone,
+      make a serious attempt to understand the solution alone afterwards.
+      You must document credit assignment in a special final question in the homework.
+
+    \item
+      \textbf{Evaluation.}
+      We reserve the right to give a 0 to a submission which violates the intent of the assignment
+      and is morally equivalent to a blank response.
+      \begin{itemize}
+        \item
+          \texttt{hw2code:} your grade is what the autograder gives you;
+          note that you may re-submit as many times as you like until the deadline.
+          However, we may reduce your auto-graded score if your solution simply hard-codes answers.
+
+        \item
+          \texttt{hw2:} you can receive $0$ points for a blank solution, an illegible solution,
+          or a solution which does not correctly mark problem parts with boxes in the gradescope
+          interface (equivalent to illegibility).
+          All other solutions receive full points, \emph{however} the graders do leave feedback
+          so please check afterwards even if you received a perfect score.
+
+      \end{itemize}
+
+    \item
+      \textbf{Regrades.}  Use the grade scope interface.
+
+    \item
+      \textbf{Late days.}
+      We track 3 late days across the semester per student.
+
+    \item
+      \textbf{Library routines.}
+      Coding problems come with suggested ``library routines''; we include these to reduce
+      your time fishing around APIs, but you are free to use other APIs.
+  \end{itemize}
+
+\noindent\textbf{Version history.}
+\begin{enumerate}
+    \item[1.0.] Initial version.
+\end{enumerate}
+
+\begin{enumerate}[font={\Large\bfseries},leftmargin=0pt]
+
+\begin{Q}
+  \textbf{\Large{}SVM with Biases.}
+
+  This problem is about SVMs over $\R^d$ with linearly separable data
+  (i.e., the hard margin SVM).
+
+  Our formulation of SVM required separators to pass through the origin, which 
+  does not provide a geometrically pleasing notion of maximum margin direction.
+
+  A first fix is provided by lecture 4: by appending a $1$ to the inputs,
+  we obtain the convex program
+  \begin{align*}
+    \min_{\vu}\quad&\frac 1 2 \|\vu\|^2\\
+    \textrm{subject to}\quad&\vu\in\R^{d+1}\\
+                            &y_i \sbr[1]{\begin{smallmatrix}\vx_i\\1\end{smallmatrix}}^\T \vu
+                            \geq 1\qquad\forall i,
+  \end{align*}
+  and let $\bar\vu$ denote the optimal solution to this program.
+
+  A second standard fix is to incorporate the bias directly into the optimization problem:
+  \begin{align*}
+    \min_{\vv,b}\quad&\frac 1 2 \|\vv\|^2\\
+    \textrm{subject to}\quad&\vv\in\R^{d}, b\in\R\\
+                            &y_i (\vv^\T \vx_i + b) \geq 1\qquad\forall i,
+  \end{align*}
+  and let $(\bar\vv,\bar b) \in \R^d \times \R$ denote an optimal solution to this program.
+  This second version is standard, but we do not use it in lecture for various reasons.
+
+  \begin{enumerate}
+    \item 
+      \hw In lecture, we stated that the first formulation is a \emph{convex program}
+      (formally defined in lecture 5).
+      Show that the second formulation is also a convex program.
+
+    \item
+      \hw Suppose there is only one datapoint: $\vx_1 = \ve_1$, the first standard basis vector, 
+      with label $y_1 = +1$.
+      The first formulation will have a unique solution $\bar\vu$, as discussed in lecture.
+      Show that the second formulation does not have a unique solution.
+
+    \item
+      \hw Let's add another datapoint: $\vx_2 = -a\ve_1$ for some $a\geq 3$, with label $y_2 = -1$.
+      Now that we have two data points, both of the convex programs now have two constraints.
+      Write out the explicit constraints to the first convex program.
+
+    \item
+      \hw Using these two constraints, show that the first coordinate
+      $\bar u_1$ of the optimal solution $\bar \vu$ satisfies $\bar u_1 \geq \frac{2}{a+1}$.
+
+    \item
+      \hw Using parts (c) and (d), find optimal solutions $\bar\vu$ and $(\bar\vv,\bar b)$, and prove they are in fact optimal.
+
+      \textbf{Hint:} If you are stuck, first try the case $d=1$. Then study what happens for $d=2,d=3,\ldots$
+
+      \textbf{Hint:} $(\bar\vv,\bar b)$ will be unique.
+
+    \item
+      \hw Now we will consider the behavior of $\bar\vu$ and $\bar\vv$ as $a$ increases;
+      to this end, write $\bar\vu_a$ and $\bar\vv_a$, and consider $a\to\infty$.
+      Determine and formally prove the limiting behavior of
+      $\lim_{a\to\infty}\frac 1 2 \|\bar\vu_a\|^2$ and $\lim_{a\to\infty}\frac 1 2 \|\bar\vv_a\|^2$.
+
+      \textbf{Hint:} The two limits will not be equal.
+
+    \item
+      \hw Between the two versions of SVM with bias, which do you prefer?
+      Any answer which contains at least one complete sentence will receive full credit.
+
+      \textbf{Remark:} Initially it may have seemed that both optimization problems have
+      the same solutions; the purpose of this problem was to highlight that small differences
+      in machine learning methods can lead to observably different performance.
+  \end{enumerate}
+\end{Q}
+  
+\begin{Q}
+    \textbf{\Large SVM Implementation.}
+    
+    Recall that the dual problem of an SVM is
+    \begin{align*}
+        \max_{\balpha\in\cC}\sum_{i=1}^{n}\alpha_i-\frac{1}{2}\sum_{i,j=1}^{n}\alpha_i\alpha_jy_iy_jK(\vx_i,\vx_j),
+    \end{align*}
+    where the domain $\cC=[0,\infty)^n=\{\balpha:\alpha_i\ge0\}$ for a  hard-margin SVM, and $\cC=[0,C]^n=\{\balpha:0\le\alpha_i\le C\}$ for a soft-margin SVM. Equivalently, we can frame this as the minimization problem
+    \begin{align*}
+        \min_{\balpha\in\cC}f(\balpha):=\frac{1}{2}\sum_{i,j=1}^{n}\alpha_i\alpha_jy_iy_jK(\vx_i,\vx_j)-\sum_{i=1}^{n}\alpha_i.
+    \end{align*}
+    This can be solved by projected gradient descent, which starts from some $\balpha_0\in\cC$ (e.g., $\boldsymbol{0}$) and updates via
+    \begin{align*}
+        \balpha_{t+1}=\Pi_{\cC}\sbr{\balpha_t-\eta\nabla f(\balpha_t)},
+    \end{align*}
+    where $\Pi_{\cC}[\balpha]$ is the \emph{projection} of $\balpha$ onto $\cC$, defined as the closest point to $\balpha$ in $\cC$:
+    \begin{align*}
+        \Pi_{\cC}[\balpha]:=\argmin_{\balpha'\in\cC}\|\balpha'-\balpha\|_2.
+    \end{align*}
+    If $\cC$ is convex, the projection is uniquely defined.
+
+    \begin{enumerate}
+        \item \hw Prove that
+        \begin{align*}
+            \del{\Pi_{[0,\infty)^n}[\balpha]}_i=\max\{\alpha_i,0\},
+        \end{align*}
+        and
+        \begin{align*}
+            \del{\Pi_{[0,C]^n}[\balpha]}_i=\min\{\max\{0,\alpha_i\},C\}.
+        \end{align*}
+        
+        \textbf{Hint:} Show that the $i$th component of any other $\valpha' \in \cC$ is further from the $i$th component of $\valpha$ than the $i$th component of the projection is. Specifically, show that $\abs{\alpha'_i - \alpha_i} \ge \abs{\max\cbr{0, \alpha_i} - \alpha_i}$ for $\valpha' \in [0,\infty)^n$ and that $\abs{\alpha'_i - \alpha_i} \ge \abs{\min\cbr{\max\cbr{0, \alpha_i}, C} - \alpha_i}$ for $\valpha' \in [0,C]^n$.
+
+        \item 
+          \hwcode Implement an \texttt{svm\_solver()}, using projected gradient descent formulated as above. Initialize your $\valpha$ to zeros. See the docstrings in \texttt{hw2.py} for details.
+        
+    \textbf{Remark:} Consider using the \texttt{.backward()} function in pytorch. 
+    However, then you may have to use in-place operations like \texttt{clamp\_()}, otherwise the gradient information is destroyed.
+    
+    \textbf{Library routines:} \texttt{torch.outer, torch.clamp, torch.autograd.backward, torch.tensor(..., requires\_grad=True), with torch.no\_grad():, torch.tensor.grad.zero\_, torch.tensor.detach.}
+
+        \item \hwcode Implement an \texttt{svm\_predictor()}, using an optimal dual solution, the training set, and an input. See the docstrings in \texttt{hw2.py} for details.
+        
+        \textbf{Library routines:} \texttt{torch.empty.}
+
+        \item \hw On the area $[-5,5]\times[-5,5]$, plot the contour lines of the following kernel SVMs, trained on the XOR data. Different kernels and the XOR data are provided in \texttt{hw2\_utils.py}.
+        Learning rate 0.1 and 10000 steps should be enough. To draw the contour lines, you can use \texttt{hw2\_utils.svm\_contour()}.
+        \begin{itemize}
+            \item The polynomial kernel with degree $2$.
+            \item The RBF kernel with $\sigma=1$.
+            \item The RBF kernel with $\sigma=2$.
+            \item The RBF kernel with $\sigma=4$.
+        \end{itemize}
+        Include these four plots in your written submission.
+    \end{enumerate}
+\end{Q}
+    
+
+
+\clearpage
+
+
+
+\begin{Q}
+  \textbf{\Large Convexity. }
+
+  In this problem, you will analyze a convex 
+  approximation of the max function and get familiar with 
+  techniques establishing convexity of a function. Denote the max function $\phi : \R^n \rightarrow \R$ 
+  and its approximation $\tildephi : \R^n \rightarrow \R$ as
+  \[
+    \phi(x) := \max( x_1, \dots , x_n), \quad \textrm{and} \quad 
+    \tildephi(x) := \ln \del{ \sum_{i = 1}^n \exp(x_i)}.
+  \]   
+  Furthermore, throughout the problem, for any vector $x \in \R^n$,
+  denote $\exp(x) := \del{ \exp(x_1), \dots, \exp(x_n) }$.
+
+
+
+\begin{enumerate}
+  \item 
+    \hw Prove that  
+  \[
+  \phi(x) \leq \tildephi(x) \leq \phi(x) + \ln(n).
+  \]
+
+  \textbf{Hint: }  Show that 
+  $\phi( \exp( x ) ) \leq \sum_{ i = 1}^n \exp(x_i) \leq n \cdot \phi(\exp(x))$.
+  
+  \textbf{Remark: } Part (a) quantifies how well $\tildephi$ approximates the max function.
+  \item 
+    \hw Use part (a) to show that 
+\[
+  \lim_{ c \rightarrow \infty} \frac{\tildephi(c x )}{ c} = \phi(x).
+\]
+\item 
+  \hw Prove that the max function $\phi$ is convex. 
+
+\item 
+  \hw Compute the Hessian $\nabla^2 \tildephi$.
+
+\item 
+  \hw Define $\lambda_i := \frac{\exp(x_i)}{\sum_{j = 1}^n \exp(x_j)}$ for $i \in [n]$.
+Rewrite the Hessian in part (d) in terms of $\{ \lambda_1 ,\dots, \lambda_n\}$.
+
+\item 
+  \hw Show that the Hessian $\nabla^2 \tildephi(x)$ is positive semi-definite for all 
+$x \in \R^n$. From lecture 3, it follows that $\tildephi$ is convex. 
+
+\textbf{Hint: } An equivalent definition of a positive semi-definite
+matrix $M \in \R^{n \times n}$ is that for any $v \in \R^n$, $v^\intercal M v \geq 0$.
+Use this definition, part (e), and Jensen's inequality (see appendix to lecture 3).
+
+\item 
+  \hw Directly show that  
+for all $\alpha \in [0,1]$ and for any $x, y \in \R^n$,
+\[
+\tildephi \del{ \alpha x + (1 - \alpha)y } \leq \alpha \tildephi(x) + (1 - \alpha) \tildephi(y).
+\]
+
+\textbf{Hint: } 
+Fix  $x, y \in \R^n$ and denote $a = \exp(x)$ and $b = \exp(y)$. 
+Write $\tildephi \del{ \alpha x + (1- \alpha)y }$ as $\ln \del{\sum_{i = 1}^n a_i^\alpha \, b_i^{(1 - \alpha)} }$
+and apply H{\"o}lder's inequality (see appendix to lecture 3).
+
+
+\textbf{Remark: }
+  This gives an alternate proof that $\tildephi$ is convex. Note that 
+  this proof does not use the fact that $\tildephi$ is twice differentiable.
+
+% \item 
+%   \hw Recall that a norm $f$ on $\R^n$ is a function $f : \R^n \rightarrow \R$ 
+% that satisfies the following properties.
+% \begin{enumerate}
+% \item \textbf{Triangle inequality. } For any $x, y \in \R^n$,  $f(x + y) \leq f(x) + f(y)$.
+% \item \textbf{Absolute homogeneity. } For any $\lambda \in \R$ and $x \in \R^n$, $f(\lambda \, x) = \abs{\lambda} \, f(x )$.
+% \item \textbf{Positive definiteness. } For any $x \in \R^d$, $f(x) = 0$ 
+% if and only if $x = 0$.
+% \end{enumerate}
+% Show that any norm $f$ on $\R^n$ is convex. Among properties (i) - (iii),
+% which did you not use, if any, to show convexity of $f$?
+
+
+\end{enumerate}
+
+
+
+\end{Q}
+
+
+\clearpage
+
+\begin{Q}
+  \textbf{\Large LLM Use and Other Sources.}
+    
+    \hw Please document, in detail, all your sources, including include LLMs, friends,
+    internet resources, etc.  For example:
+    \begin{enumerate}
+      \item[1a.] I asked my friend, then I found a different way to derive the same solution.
+      \item[1b.] ChatGPT 4o solved the problem in one shot, but then I rewrote it once one
+        paper, and a few days later tried to re-derive an answer from scratch.
+      \item[1c.] I accidentally found this via a google search,
+        and had trouble forgetting the answer I found, but still typed it from scratch
+        without copy-paste.
+      \item[1d.] \dots
+      \item[\vdots] 
+      \item[6.] I used my solution to problem 5 to write this answer.
+    \end{enumerate}
+    
+\end{Q}
+
+\end{enumerate}
+
+
+% \newpage
+% \nocite{*}
+% \bibliography{hw2}   
+
+\end{document}
