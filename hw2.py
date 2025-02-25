@@ -47,8 +47,6 @@ def svm_solver(x_train, y_train, lr, num_iters,
         # Ensure alpha retains gradient tracking
         alpha.requires_grad_()
         
-        if _ % 100 == 0 or i == num_iters - 1:
-            print(f"Iteration {_}: Max α = {alpha.max().item()}, Min α = {alpha.min().item()}")
 
         # Debugging output)
     return alpha.detach()
@@ -72,20 +70,16 @@ def svm_predictor(alpha, x_train, y_train, x_test, kernel):
         A 1d tensor with shape (m,), the outputs of SVM on the test set.
     '''
     # Compute the kernel matrix for the test set against the training set
-    train_mean = x_train.mean(dim=0)
-    train_std = x_train.std(dim=0)
-    x_train = (x_train - train_mean) / train_std
-    x_test = (x_test - train_mean) / train_std  # Ensure test set uses training mean/std
 
-    K_test = torch.empty(x_test.shape[0], x_train.shape[0])
+    K_test = torch.zeros((x_test.shape[0], x_train.shape[0]),dtype=torch.float)
 
     for i in range(x_test.shape[0]):
         for j in range(x_train.shape[0]):
-            K_test[i, j] = utils.poly_implementation(x_test[i], x_train[j],2)
+            K_test[i, j] = kernel(x_test[i].unsqueeze(0), x_train[j].unsqueeze(0))
 
     # Compute the SVM decision scores
-    scores = torch.matmul((alpha * y_train), K_test.T)
+    scores = torch.matmul(K_test, alpha * y_train)
 
-    return scores.detach()
+    return scores
 
 
